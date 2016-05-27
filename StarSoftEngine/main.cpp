@@ -2,6 +2,7 @@
 #include <ddraw.h>
 #include <stdio.h>
 #include "StarVector2.h"
+#include "StarBase.h"
 using namespace Star;
 
 #pragma  comment(lib, "ddraw.lib")
@@ -17,6 +18,13 @@ wchar_t* szMsg = L"Hello World";
 const int ScreenWidth = 800;
 const int ScreenHeight = 600;
 
+BYTE* pSurface = NULL;
+int pitch = 0;
+Vector2* Pos0;
+Vector2* Pos1;
+Vector2* Pos2;
+
+
 #define  ARGB(a, r, g, b) ((a<<24) + (r<<16) + (g<<8) + b)
 
 // 函数声明
@@ -25,6 +33,7 @@ bool CheckMessages();
 BOOL InitWindow(HINSTANCE hInstance, int nCmdShow);
 BOOL InitDDraw(void);
 void FreeDDraw(void);
+void InitData();
 void Render();
 
 //*************************************************************************
@@ -44,6 +53,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		DestroyWindow(GetActiveWindow());
 		return FALSE;
 	}
+
+	InitData();
 
 	// 消息循环
 	while (CheckMessages())
@@ -260,6 +271,13 @@ BOOL InitDDraw()
 	return TRUE;
 }
 
+void InitData()
+{
+	Pos0 = new Vector2(100, 100);
+	Pos1 = new Vector2(100, 200);
+	Pos2 = new Vector2(300, 300);
+}
+
 WORD & WordAt(int x, int y, BYTE*& pSurface, int pitch)
 {
 	WORD* pPixel = (WORD*)(pSurface + pitch * y);
@@ -279,14 +297,127 @@ void SetPixel(int x, int y, DWORD color, BYTE*& pSurface, int pitch)
 	DWordAt(x, y, pSurface, pitch) = color;
 }
 
+void RasterizeScanline(int nYPos, int nStartXPos, int nEndXpos)
+{
+	for (; nStartXPos < nEndXpos; nStartXPos++)
+	{
+		SetPixel(nStartXPos, nYPos, ARGB(0, 255, 125, 125), pSurface, pitch);
+	}
+}
+
 void RasterizeTriangle(Vector2* pPos0, Vector2* pPos1, Vector2* pPos2)
 {
 	// sort Position by y
 	const Vector2* pVertices[3] = { pPos0, pPos1, pPos2 };
 
+	if (pPos1->y < pVertices[0]->y)
+	{
+		pVertices[1] = pVertices[0];
+		pVertices[0] = pPos1;
+	}
+	if (pPos2->y < pVertices[0]->y)
+	{
+		pVertices[2] = pVertices[1];
+		pVertices[1] = pVertices[0];
+		pVertices[0] = pPos2;
+	}
+	else if (pPos2->y < pVertices[0]->y)
+	{
+		pVertices[2] = pVertices[1];
+		pVertices[1] = pPos2;
+	}
 
+	// pos references
+	// type:0		1
+	//		A       A
+	//	   / |      | \
+	//	  /  |      |  \
+	//	  B  |      |   B
+	//	  \  |      |  /
+	//     \ |	    | /
+	//		 C		 C
+	const Vector2& vA = *pVertices[0];
+	const Vector2& vB = *pVertices[1];
+	const Vector2& vC = *pVertices[2];
+
+	// reciprocal of slope, 1/(y/x)
+	const float fRecSlopeX[3] = {
+		(vB.y - vA.y > 0.0f) ? (vB.x - vA.x) / (vB.y - vA.y) : 0.0f,
+		(vC.y - vA.y > 0.0f) ? (vC.x - vA.x) / (vC.y - vA.y) : 0.0f,
+		(vC.y - vB.y > 0.0f) ? (vC.x - vB.x) / (vC.y - vB.y) : 0.0f
+	};
+
+	// begin rasterization
+	float fLeftEdge = vA.x;
+	float fRightEdge = vA.x;
+	for (int nPart = 0; nPart < 2; ++nPart)
+	{
+		int nStartY, nEndY;
+		float fDeltaXLeft, fDeltaXRight;
+
+		switch (nPart)
+		{
+		case 0:	// Draw upper part of triangle, decide upper slope and begin point
+			{
+				nStartY = ftol(ceilf(vA.y));
+				nEndY = ftol(ceilf(vB.y));
+
+				// left reciprocal of slope must small than right
+				// type 1
+				if (fRecSlopeX[0] > fRecSlopeX[1])	// decide the left or right
+				{
+					fDeltaXLeft = fRecSlopeX[1];
+					fDeltaXRight = fRecSlopeX[0];
+				}
+				else  // type 0
+				{
+					fDeltaXLeft = fRecSlopeX[0];
+					fDeltaXRight = fRecSlopeX[1];
+				}
+				
+				// consider the difference because of the ceil operation
+				const float fCeilDiffY = (float)nStartY - vA.y;
+				fLeftEdge += fDeltaXLeft * fCeilDiffY;
+				fRightEdge += fDeltaXRight * fCeilDiffY;
+			}
+			break;
+
+		case 1:	// Draw lower part of triangle, decide down slope and begin point
+			{
+				nEndY = ftol(ceilf(vC.y));
+
+				const float fCeilDiffY = (float)nStartY - vB.y;
+				// type 1
+				if (fRecSlopeX[1] > fRecSlopeX[2])
+				{
+					fDeltaXLeft = fRecSlopeX[1];
+					fDeltaXRight = fRecSlopeX[2];
+					fRightEdge = vB.x + fDeltaXRight * fCeilDiffY;
+				}
+				else
+				{
+					fDeltaXLeft = fRecSlopeX[2];
+					fDeltaXRight = fRecSlopeX[1];
+					fLeftEdge = vB.x + fDeltaXLeft * fCeilDiffY;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+
+		for (; nStartY < nEndY; nStartY++, fLeftEdge += fDeltaXLeft, fRightEdge += fDeltaXRight)
+		{
+			const int nLeftEdge = ftol(ceilf(fLeftEdge));
+			const int nRightEdge = ftol(ceilf(fRightEdge));
+			RasterizeScanline(nStartY, nLeftEdge, nRightEdge);
+		}
+
+	} // end of two parts for loop
 
 }
+
+
 
 // 实时渲染
 void Render()
@@ -299,17 +430,18 @@ void Render()
 	if (lpDDBack->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL) != DD_OK)
 		return;
 
-	BYTE* pSurface = (BYTE*)ddsd.lpSurface;
+	pSurface = (BYTE*)ddsd.lpSurface;
 
 	// draw
 	// 取得当前显示RGB位数，目前只处理32位
 	int bpp = ddsd.ddpfPixelFormat.dwRGBBitCount;
-	int pitch = ddsd.lPitch;
+	pitch = ddsd.lPitch;
 
-	for (int i = 0; i < ScreenWidth; i++)
-	{
-		SetPixel(i, 100, ARGB(0, 125, 0, 255), pSurface, pitch);
-	}
+// 	for (int i = 0; i < ScreenWidth; i++)
+// 	{
+// 		SetPixel(i, 100, ARGB(0, 125, 0, 255), pSurface, pitch);
+// 	}
+	RasterizeTriangle(Pos0, Pos1, Pos2);
 
 	lpDDBack->Unlock(NULL);
 
