@@ -1,6 +1,13 @@
 #include <math.h>
 
 
+enum EStarResult
+{
+	SR_OK = 0,
+	SR_UKNOWN
+};
+
+
 inline int ftol(float f)
 {
 	static int tmp;
@@ -17,3 +24,12 @@ inline int ftol(float f)
 
 	return tmp;
 }
+
+// types define
+enum  EColorFormat
+{
+	CFMT_R32,
+	CFMT_R32G32,
+	CFMT_R32G32B32,
+	CFMT_R32G32B32A32
+};
