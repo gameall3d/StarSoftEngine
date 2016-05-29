@@ -79,11 +79,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="StarRectangle.cpp" />
     <ClCompile Include="StarSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StarBase.h" />
     <ClInclude Include="StarDevice.h" />
+    <ClInclude Include="StarRectangle.h" />
     <ClInclude Include="StarSurface.h" />
     <ClInclude Include="StarVector2.h" />
   </ItemGroup>

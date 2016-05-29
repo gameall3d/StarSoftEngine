@@ -21,19 +21,25 @@
     <ClCompile Include="StarSurface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="StarRectangle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="StarVector2.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="StarBase.h">
-      <Filter>源文件</Filter>
+    <ClInclude Include="StarRectangle.h">
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StarSurface.h">
-      <Filter>源文件</Filter>
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarVector2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarBase.h">
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StarDevice.h">
-      <Filter>源文件</Filter>
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
