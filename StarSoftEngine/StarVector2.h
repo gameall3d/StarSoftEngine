@@ -2,20 +2,22 @@
 #ifndef __Vector2_H_
 #define __Vector2_H_
 
+#include "StarBase.h"
+
 namespace Star
 {
-	class Vector2
+	class StarVector2
 	{
 	public:
-		float x, y;
+		float32 x, y;
 
 	public:
-		inline Vector2()
+		inline StarVector2()
 		{
 
 		}
 
-		inline Vector2(const float fX, const float fY)
+		inline StarVector2(const float32 fX, const float32 fY)
 			:x(fX), y(fY)
 		{
 

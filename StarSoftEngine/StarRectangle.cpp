@@ -1,11 +1,14 @@
 #include "StarRectangle.h"
 
-
-StarRectangle::StarRectangle()
+namespace Star
 {
+	StarRectangle::StarRectangle()
+	{
+	}
+
+
+	StarRectangle::~StarRectangle()
+	{
+	}
 }
 
-
-StarRectangle::~StarRectangle()
-{
-}

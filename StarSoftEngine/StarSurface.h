@@ -3,21 +3,40 @@
 
 #include "StarBase.h"
 #include "StarRectangle.h"
+#include "StarPrerequisites.h"
 
-class StarSurface
+namespace Star
 {
-public:
-	EStarResult Create(int nWidth, int nHeight, EColorFormat eColorFormat);
+	class StarSurface
+	{
+	public:
+		StarSurface(StarDevice* pDevice);
+		~StarSurface();
+		EStarResult Create(uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat);
 
-	EStarResult LockRect(void** out_ppData, const StarRectangle* in_pRect);
+		EStarResult LockRect(void** out_ppData, const StarRectangle* in_pRect);
+		EStarResult UnlockRect();
 
-private:
-	EColorFormat	m_eColorFormat;
-	int				m_nWidth;
-	int				m_nHeight;
-	
+		uint32 GetFormatFloats();
+		uint32 GetWidth();
+		uint32 GetHeight();
 
-	float*			m_pData;
-};
+	private:
+		class StarDevice*	m_pDevice;
+
+		EColorFormat	m_eColorFormat;
+		uint32				m_nFormatFloats;
+		uint32				m_nWidth;
+		uint32				m_nHeight;
+
+		bool			m_bLocked;
+		StarRectangle	m_PartialLockRect;
+		float32*			m_pPartialLockData;
+
+		float32*			m_pData;
+	};
+}
+
+
 
 #endif // end of __STARSUFACE_H_

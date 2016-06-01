@@ -24,6 +24,24 @@
     <ClCompile Include="StarRectangle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="StarRenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StarRenderInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StarDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StarColor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Star3D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StarPresentTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StarRectangle.h">
@@ -39,6 +57,30 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StarDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarPrerequisites.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRenderInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarColor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarMath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Star3D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarTypes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StarPresentTarget.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

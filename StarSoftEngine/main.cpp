@@ -3,36 +3,40 @@
 #include <stdio.h>
 #include "StarVector2.h"
 #include "StarBase.h"
+#include "StarPrerequisites.h"
+#include "StarDevice.h"
+#include "StarRenderTarget.h"
+#include "StarSurface.h"
+#include "StarMath.h"
+#include "Star3D.h"
+
 using namespace Star;
 
 #pragma  comment(lib, "ddraw.lib")
 #pragma  comment(lib, "dxguid.lib")
 
-LPDIRECTDRAW7 lpDD;	//DirectDraw对象
-LPDIRECTDRAWSURFACE7 lpDDSPrimary;	// DirectDraw主Surface
-LPDIRECTDRAWSURFACE7 lpDDBack;
-LPDIRECTDRAWCLIPPER lpClipper;		//裁剪器
 HWND hWnd;	//窗口句柄
-bool bWindowed = true;	//是否要窗口化
 wchar_t* szMsg = L"Hello World";
 const int ScreenWidth = 800;
 const int ScreenHeight = 600;
 
 BYTE* pSurface = NULL;
 int pitch = 0;
-Vector2* Pos0;
-Vector2* Pos1;
-Vector2* Pos2;
+StarVector2* Pos0;
+StarVector2* Pos1;
+StarVector2* Pos2;
 
+// Test Device
+Star3D*		pStar3D;
+StarDevice* pDevice;
+StarSurface* pColorBuffer;
+StarRenderTarget* pRenderTarget;
 
-#define  ARGB(a, r, g, b) ((a<<24) + (r<<16) + (g<<8) + b)
 
 // 函数声明
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 bool CheckMessages();
 BOOL InitWindow(HINSTANCE hInstance, int nCmdShow);
-BOOL InitDDraw(void);
-void FreeDDraw(void);
 void InitData();
 void Render();
 
@@ -46,13 +50,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		return FALSE;
 
 	//初始化DirectDraw
-	if (!InitDDraw())
-	{
-		MessageBox(GetActiveWindow(), TEXT("Init DirectDraw Failed"), TEXT("Error"), MB_OK);
-		FreeDDraw();
-		DestroyWindow(GetActiveWindow());
-		return FALSE;
-	}
+// 	if (!InitDDraw())
+// 	{
+// 		MessageBox(GetActiveWindow(), TEXT("Init DirectDraw Failed"), TEXT("Error"), MB_OK);
+// 		FreeDDraw();
+// 		DestroyWindow(GetActiveWindow());
+// 		return FALSE;
+// 	}
 
 	InitData();
 
@@ -65,7 +69,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Sleep(1);
 	}
 
-	FreeDDraw();
 	return 0;
 }
 
@@ -174,308 +177,33 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-//*************************************************************************
-//初始化DirectDraw环境
-//*************************************************************************
-BOOL InitDDraw()
-{
-	DDSURFACEDESC2 ddsd;	//页面描述
-
-	// 创建DirectDraw对像
-	if (DirectDrawCreateEx(NULL, (void**)&lpDD, IID_IDirectDraw7, 0) != DD_OK)
-		return FALSE;
-
-	if (bWindowed)
-	{
-		// 设置协调层级
-		if (lpDD->SetCooperativeLevel(GetActiveWindow(), DDSCL_NORMAL) != DD_OK)
-			return FALSE;
-	}
-	else
-	{
-		// 取得独占和全屏模式
-		if (lpDD->SetCooperativeLevel(GetActiveWindow(), DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) != DD_OK)
-			return FALSE;
-	}
-
-
-	// 设置显示模式,在窗口模式下不能设置显示模式
-// 	HRESULT hr;
-// 	hr = lpDD->SetDisplayMode(640, 480, 8);
-// 	if (hr != DD_OK)
-// 		return FALSE;
-
-	ZeroMemory(&ddsd, sizeof(ddsd));
-
-	// 填充主页面信息
-	ddsd.dwSize = sizeof(ddsd);
-	ddsd.dwFlags = DDSD_CAPS;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-
-	// 创建主页面对象
-	if (lpDD->CreateSurface(&ddsd, &lpDDSPrimary, NULL) != DD_OK)
-		return FALSE;
-
-	if (bWindowed)
-	{
-		//在窗口模式下你需要一个完全不同的“缓冲系统”,你不能在创建主表面时连接一个后缓冲区然后调用flip()函数来翻转,
-		//因为你在窗口模式下不能独享显卡,而翻转是交换主表面和一个与其相连的后缓冲区的地址的过程,显然,你不能在窗口模
-		//式下这么做,因为此时你和其它应用程序共享主表面
-		ddsd.dwFlags = DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH;
-		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-		ddsd.dwWidth = ScreenWidth;
-		ddsd.dwHeight = ScreenHeight;
-
-		if (lpDD->CreateSurface(&ddsd, &lpDDBack, NULL) != DD_OK)
-		{
-			return FALSE;
-		}
-
-		//在DirectDraw中主表面往往表示整个屏幕.为了防止你在窗口模式下在整个屏幕里作图,
-		//你可以给主表面连接一个裁剪器,并将其与主窗口相连
-		//创建裁剪器
-		if (lpDD->CreateClipper(0, &lpClipper, NULL) != DD_OK)
-		{
-			lpDDSPrimary->Release();
-			lpDD->Release();
-			return FALSE;
-		}
-
-		if (lpClipper->SetHWnd(0, hWnd) != DD_OK)
-		{
-			lpClipper->Release();
-			lpDDSPrimary->Release();
-			lpDD->Release();
-			return FALSE;
-		}
-
-		if (lpDDSPrimary->SetClipper(lpClipper) != DD_OK)
-		{
-			lpClipper->Release();
-			lpDDSPrimary->Release();
-			lpDD->Release();
-			return FALSE;
-		}
-
-	}
-
-//	HDC hdc;	//设备环境句柄
-// 	if (lpDDSPrimary->GetDC(&hdc) != DD_OK)
-// 		return FALSE;
-// 
-// 	SetBkColor(hdc, RGB(0, 0, 255));
-// 	SetTextColor(hdc, RGB(255, 255, 0));
-// 	TextOut(hdc, 220, 220, szMsg, lstrlen(szMsg));
-// 	lpDDSPrimary->ReleaseDC(hdc);
-
-	return TRUE;
-}
-
 void InitData()
 {
-	Pos0 = new Vector2(100, 100);
-	Pos1 = new Vector2(100, 200);
-	Pos2 = new Vector2(300, 300);
+	Pos0 = new StarVector2(100, 100);
+	Pos1 = new StarVector2(100, 200);
+	Pos2 = new StarVector2(300, 300);
+
+	StarDevice_Parameters deviceParam;
+	deviceParam.hDeviceWindow = hWnd;
+	deviceParam.bWindowed = true;
+	deviceParam.nBackBufferHeight = ScreenHeight;
+	deviceParam.nBackBufferWidth = ScreenWidth;
+
+	pStar3D = Star3DCreate(0);
+	pStar3D->CreateDevice(&pDevice, &deviceParam);
+	
+	pRenderTarget = new StarRenderTarget(pDevice);
+	pDevice->CreateSurface(&pColorBuffer, ScreenWidth, ScreenHeight, CFMT_R32G32B32A32);
+	pDevice->SetRenderTarget(pRenderTarget);
+	pRenderTarget->SetColorBuffer(pColorBuffer);
 }
-
-WORD & WordAt(int x, int y, BYTE*& pSurface, int pitch)
-{
-	WORD* pPixel = (WORD*)(pSurface + pitch * y);
-
-	return pPixel[x];
-}
-
-DWORD & DWordAt(int x, int y, BYTE*& pSurface, int pitch)
-{
-	DWORD* pPixel = (DWORD*)(pSurface + pitch * y);
-
-	return pPixel[x];
-}
-
-void SetPixel(int x, int y, DWORD color, BYTE*& pSurface, int pitch)
-{
-	DWordAt(x, y, pSurface, pitch) = color;
-}
-
-void RasterizeScanline(int nYPos, int nStartXPos, int nEndXpos)
-{
-	for (; nStartXPos < nEndXpos; nStartXPos++)
-	{
-		SetPixel(nStartXPos, nYPos, ARGB(0, 255, 125, 125), pSurface, pitch);
-	}
-}
-
-void RasterizeTriangle(Vector2* pPos0, Vector2* pPos1, Vector2* pPos2)
-{
-	// sort Position by y
-	const Vector2* pVertices[3] = { pPos0, pPos1, pPos2 };
-
-	if (pPos1->y < pVertices[0]->y)
-	{
-		pVertices[1] = pVertices[0];
-		pVertices[0] = pPos1;
-	}
-	if (pPos2->y < pVertices[0]->y)
-	{
-		pVertices[2] = pVertices[1];
-		pVertices[1] = pVertices[0];
-		pVertices[0] = pPos2;
-	}
-	else if (pPos2->y < pVertices[0]->y)
-	{
-		pVertices[2] = pVertices[1];
-		pVertices[1] = pPos2;
-	}
-
-	// pos references
-	// type:0		1
-	//		A       A
-	//	   / |      | \
-	//	  /  |      |  \
-	//	  B  |      |   B
-	//	  \  |      |  /
-	//     \ |	    | /
-	//		 C		 C
-	const Vector2& vA = *pVertices[0];
-	const Vector2& vB = *pVertices[1];
-	const Vector2& vC = *pVertices[2];
-
-	// reciprocal of slope, 1/(y/x)
-	const float fRecSlopeX[3] = {
-		(vB.y - vA.y > 0.0f) ? (vB.x - vA.x) / (vB.y - vA.y) : 0.0f,
-		(vC.y - vA.y > 0.0f) ? (vC.x - vA.x) / (vC.y - vA.y) : 0.0f,
-		(vC.y - vB.y > 0.0f) ? (vC.x - vB.x) / (vC.y - vB.y) : 0.0f
-	};
-
-	// begin rasterization
-	float fLeftEdge = vA.x;
-	float fRightEdge = vA.x;
-	for (int nPart = 0; nPart < 2; ++nPart)
-	{
-		int nStartY, nEndY;
-		float fDeltaXLeft, fDeltaXRight;
-
-		switch (nPart)
-		{
-		case 0:	// Draw upper part of triangle, decide upper slope and begin point
-			{
-				nStartY = ftol(ceilf(vA.y));
-				nEndY = ftol(ceilf(vB.y));
-
-				// left reciprocal of slope must small than right
-				// type 1
-				if (fRecSlopeX[0] > fRecSlopeX[1])	// decide the left or right
-				{
-					fDeltaXLeft = fRecSlopeX[1];
-					fDeltaXRight = fRecSlopeX[0];
-				}
-				else  // type 0
-				{
-					fDeltaXLeft = fRecSlopeX[0];
-					fDeltaXRight = fRecSlopeX[1];
-				}
-				
-				// consider the difference because of the ceil operation
-				const float fCeilDiffY = (float)nStartY - vA.y;
-				fLeftEdge += fDeltaXLeft * fCeilDiffY;
-				fRightEdge += fDeltaXRight * fCeilDiffY;
-			}
-			break;
-
-		case 1:	// Draw lower part of triangle, decide down slope and begin point
-			{
-				nEndY = ftol(ceilf(vC.y));
-
-				const float fCeilDiffY = (float)nStartY - vB.y;
-				// type 1
-				if (fRecSlopeX[1] > fRecSlopeX[2])
-				{
-					fDeltaXLeft = fRecSlopeX[1];
-					fDeltaXRight = fRecSlopeX[2];
-					fRightEdge = vB.x + fDeltaXRight * fCeilDiffY;
-				}
-				else
-				{
-					fDeltaXLeft = fRecSlopeX[2];
-					fDeltaXRight = fRecSlopeX[1];
-					fLeftEdge = vB.x + fDeltaXLeft * fCeilDiffY;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-
-		for (; nStartY < nEndY; nStartY++, fLeftEdge += fDeltaXLeft, fRightEdge += fDeltaXRight)
-		{
-			const int nLeftEdge = ftol(ceilf(fLeftEdge));
-			const int nRightEdge = ftol(ceilf(fRightEdge));
-			RasterizeScanline(nStartY, nLeftEdge, nRightEdge);
-		}
-
-	} // end of two parts for loop
-
-}
-
-
 
 // 实时渲染
 void Render()
 {
-	DDSURFACEDESC2 ddsd;
+	pDevice->PreRender();
+	pDevice->RasterizeTriangle(Pos0, Pos1, Pos2);
+	pDevice->PostRender();
 
-	ZeroMemory(&ddsd, sizeof(ddsd));
-	ddsd.dwSize = sizeof(ddsd);
-
-	if (lpDDBack->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL) != DD_OK)
-		return;
-
-	pSurface = (BYTE*)ddsd.lpSurface;
-
-	// draw
-	// 取得当前显示RGB位数，目前只处理32位
-	int bpp = ddsd.ddpfPixelFormat.dwRGBBitCount;
-	pitch = ddsd.lPitch;
-
-// 	for (int i = 0; i < ScreenWidth; i++)
-// 	{
-// 		SetPixel(i, 100, ARGB(0, 125, 0, 255), pSurface, pitch);
-// 	}
-	RasterizeTriangle(Pos0, Pos1, Pos2);
-
-	lpDDBack->Unlock(NULL);
-
-	// 计算源和目标的矩形区域
-	POINT pntTopLeft = { 0, 0 };
-	ClientToScreen(hWnd, &pntTopLeft);
-
-	RECT rctDestination;
-	GetClientRect(hWnd, &rctDestination);
-	OffsetRect(&rctDestination, pntTopLeft.x, pntTopLeft.y);
-
-	RECT rctSource;
-	SetRect(&rctSource, 0, 0, ScreenWidth, ScreenHeight);
-	
-	// 将后缓冲指定区内容复制到前面层指定区域去
-	if (lpDDSPrimary->Blt(&rctDestination, lpDDBack, &rctSource, DDBLT_WAIT, 0) != DD_OK)
-	{
-		return;
-	}
-}
-
-//*************************************************************************
-//释放DirectDraw对象
-//*************************************************************************
-void FreeDDraw()
-{
-	if (lpDD != NULL)
-	{
-		if (lpDDSPrimary != NULL)
-		{
-			lpDDSPrimary->Release();
-			lpDDSPrimary = NULL;
-		}
-		lpDD->Release();
-		lpDD = NULL;
-	}
+	pDevice->Present(pRenderTarget);
 }

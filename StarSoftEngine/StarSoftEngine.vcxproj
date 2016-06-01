@@ -79,14 +79,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Star3D.cpp" />
+    <ClCompile Include="StarColor.cpp" />
+    <ClCompile Include="StarDevice.cpp" />
+    <ClCompile Include="StarPresentTarget.cpp" />
     <ClCompile Include="StarRectangle.cpp" />
+    <ClCompile Include="StarRenderInfo.cpp" />
+    <ClCompile Include="StarRenderTarget.cpp" />
     <ClCompile Include="StarSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Star3D.h" />
     <ClInclude Include="StarBase.h" />
+    <ClInclude Include="StarColor.h" />
     <ClInclude Include="StarDevice.h" />
+    <ClInclude Include="StarMath.h" />
+    <ClInclude Include="StarPrerequisites.h" />
+    <ClInclude Include="StarPresentTarget.h" />
     <ClInclude Include="StarRectangle.h" />
+    <ClInclude Include="StarRenderInfo.h" />
+    <ClInclude Include="StarRenderTarget.h" />
     <ClInclude Include="StarSurface.h" />
+    <ClInclude Include="StarTypes.h" />
     <ClInclude Include="StarVector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

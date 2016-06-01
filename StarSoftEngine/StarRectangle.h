@@ -1,16 +1,20 @@
 #ifndef __STARRECTANGLE_H_
 #define __STARRECTANGLE_H_
 
-class StarRectangle
+namespace Star
 {
-public:
-	StarRectangle();
-	~StarRectangle();
+	class StarRectangle
+	{
+	public:
+		StarRectangle();
+		~StarRectangle();
 
-public:
-	int nLeft, nTop;
-	int nRight, nBottom;
-};
+	public:
+		int32 nLeft, nTop;
+		int32 nRight, nBottom;
+	};
+
+}
 
 #endif // __STARRECTANGLE_H_
 

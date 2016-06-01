@@ -55,3 +55,4 @@ StarSoftEngine/Debug/StarSoftEngine.log
 *.suo
 StarSoftEngine/Debug/vc120.pdb
 StarSoftEngine/Debug/vc120.idb
+*.obj
