@@ -48,14 +48,6 @@ namespace Star
 		return tmp;
 	}
 
-	// types define
-	enum  EColorFormat
-	{
-		CFMT_R32,
-		CFMT_R32G32,
-		CFMT_R32G32B32,
-		CFMT_R32G32B32A32
-	};
 
 /// Outputs an error-description in case a function fails, only available in debug-builds.
 /// @param[in] errdesc error-description, c-string.

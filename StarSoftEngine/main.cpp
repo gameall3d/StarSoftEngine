@@ -7,7 +7,7 @@
 #include "StarDevice.h"
 #include "StarRenderTarget.h"
 #include "StarSurface.h"
-#include "StarMath.h"
+#include "StarTypes.h"
 #include "Star3D.h"
 
 using namespace Star;
@@ -25,6 +25,10 @@ int pitch = 0;
 StarVector2* Pos0;
 StarVector2* Pos1;
 StarVector2* Pos2;
+
+StarVertexData* WorldPos0;
+StarVertexData* WorldPos1;
+StarVertexData* WorldPos2;
 
 // Test Device
 Star3D*		pStar3D;
@@ -183,6 +187,13 @@ void InitData()
 	Pos1 = new StarVector2(100, 200);
 	Pos2 = new StarVector2(300, 300);
 
+	WorldPos0 = new StarVertexData();
+	WorldPos1 = new StarVertexData();
+	WorldPos2 = new StarVertexData();
+	WorldPos0->pos = StarVector4(1, -1, 1, 1);
+	WorldPos1->pos = StarVector4(-1, -1, 1, 1);
+	WorldPos2->pos = StarVector4(-1, 1, 1, 1);
+
 	StarDevice_Parameters deviceParam;
 	deviceParam.hDeviceWindow = hWnd;
 	deviceParam.bWindowed = true;
@@ -196,13 +207,28 @@ void InitData()
 	pDevice->CreateSurface(&pColorBuffer, ScreenWidth, ScreenHeight, CFMT_R32G32B32A32);
 	pDevice->SetRenderTarget(pRenderTarget);
 	pRenderTarget->SetColorBuffer(pColorBuffer);
+
+	float aspect = (float32)ScreenWidth / ScreenHeight;
+	StarVector3 eyePos(0.0f, 0.0f, -15.0f);
+	StarVector3 lookatPos(0.0f, 0.0f, 0.0f);
+	StarVector3 upDir(0.0f, 1.0f, 0.0f);
+
+	StarMatrix44 matView;
+	matView = StarMatrix44::BuildMatrixLookAtLH(eyePos, lookatPos, upDir);
+	pDevice->SetTransform(STST_WORLD, &matView);
+
+	StarMatrix44 matProj;
+	matProj = StarMatrix44::BuildMatrixPerspectiveFOVLH(STAR_PI / 3, aspect, 1.0f, 100.0f);
+	pDevice->SetTransform(STST_PROJECTION, &matProj);
 }
 
 // ÊµÊ±äÖÈ¾
 void Render()
 {
 	pDevice->PreRender();
-	pDevice->RasterizeTriangle(Pos0, Pos1, Pos2);
+	//pDevice->RasterizeTriangle(Pos0, Pos1, Pos2);
+	pDevice->DrawTriangle(WorldPos0, WorldPos1, WorldPos2);
+
 	pDevice->PostRender();
 
 	pDevice->Present(pRenderTarget);

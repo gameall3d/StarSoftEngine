@@ -1,9 +1,9 @@
 #ifndef __STARDEVICE_H_
 #define __STARDEVICE_H_
 
-#include "StarBase.h"
 #include "StarPrerequisites.h"
 #include "StarTypes.h"
+#include "StarMatrix44.h"
 
 namespace Star
 {
@@ -23,8 +23,13 @@ namespace Star
 		EStarResult Present(StarRenderTarget* in_pRenderTarget);
 		void PostRender();
 
+		void DrawTriangle(StarVertexData* pV0, StarVertexData* pV1, StarVertexData* pV2);
+		int32 CheckCVV(StarVector4* pPos);
+		void Homoginize(const StarVector4* in_pPos, StarVector4* out_pPos);
 		void RasterizeTriangle(StarVector2* pPos0, StarVector2* pPos1, StarVector2* pPos2);
 		void RasterizeScanline(int32 nYPos, int32 nStartXPos, int32 nEndXpos);
+
+		void SetTransform(EStarTransformStateType eTransformState, StarMatrix44* mat);
 
 
 		const StarDevice_Parameters& GetDeviceParameters();
@@ -36,6 +41,9 @@ namespace Star
 		StarPresentTarget* m_pPresentTarget;
 		StarRenderTarget* m_pRenderTarget;
 		StarRenderInfo* m_pRenderInfo;
+
+		StarMatrix44 m_TransformMatrix[STST_NUM];
+		StarMatrix44 m_WVPMatrix;
 	};
 }
 

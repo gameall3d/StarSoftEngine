@@ -1,7 +1,7 @@
 #ifndef __STARSUFACE_H_
 #define __STARSUFACE_H_
 
-#include "StarBase.h"
+#include "StarTypes.h"
 #include "StarRectangle.h"
 #include "StarPrerequisites.h"
 

@@ -12,6 +12,9 @@ namespace Star
 
 	class StarRectangle;
 	class StarVector2;
+	class StarVector3;
+	class StarVector4;
+	class StarMatrix44;
 	class StarColor;
 	class StarMath;
 }

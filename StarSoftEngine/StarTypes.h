@@ -2,6 +2,7 @@
 #define __STARTYPES_H_
 
 #include "StarBase.h"
+#include "StarMath.h"
 
 #ifdef WIN32
 
@@ -18,6 +19,29 @@ namespace Star
 
 		WindowHandle hDeviceWindow;
 		bool		 bWindowed;
+	};
+
+	// types define
+	enum  EColorFormat
+	{
+		CFMT_R32,
+		CFMT_R32G32,
+		CFMT_R32G32B32,
+		CFMT_R32G32B32A32
+	};
+
+	enum EStarTransformStateType
+	{
+		STST_WORLD,
+		STST_VIEW,
+		STST_PROJECTION,
+
+		STST_NUM
+	};
+
+	struct StarVertexData
+	{
+		StarVector4 pos;
 	};
 }
 

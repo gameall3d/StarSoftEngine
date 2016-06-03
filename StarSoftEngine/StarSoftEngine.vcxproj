@@ -82,11 +82,14 @@
     <ClCompile Include="Star3D.cpp" />
     <ClCompile Include="StarColor.cpp" />
     <ClCompile Include="StarDevice.cpp" />
+    <ClCompile Include="StarMatrix44.cpp" />
     <ClCompile Include="StarPresentTarget.cpp" />
     <ClCompile Include="StarRectangle.cpp" />
     <ClCompile Include="StarRenderInfo.cpp" />
     <ClCompile Include="StarRenderTarget.cpp" />
     <ClCompile Include="StarSurface.cpp" />
+    <ClCompile Include="StarVector3.cpp" />
+    <ClCompile Include="StarVector4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Star3D.h" />
@@ -94,6 +97,7 @@
     <ClInclude Include="StarColor.h" />
     <ClInclude Include="StarDevice.h" />
     <ClInclude Include="StarMath.h" />
+    <ClInclude Include="StarMatrix44.h" />
     <ClInclude Include="StarPrerequisites.h" />
     <ClInclude Include="StarPresentTarget.h" />
     <ClInclude Include="StarRectangle.h" />
@@ -102,6 +106,8 @@
     <ClInclude Include="StarSurface.h" />
     <ClInclude Include="StarTypes.h" />
     <ClInclude Include="StarVector2.h" />
+    <ClInclude Include="StarVector3.h" />
+    <ClInclude Include="StarVector4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

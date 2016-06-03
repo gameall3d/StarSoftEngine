@@ -13,6 +13,11 @@ namespace Star
 		m_pRenderInfo = new StarRenderInfo();
 
 		memcpy(&m_DeviceParameters, in_pDeviceParameters, sizeof(StarDevice_Parameters));
+
+		for (int i = 0; i < STST_NUM; i++)
+		{
+			m_TransformMatrix[i] = StarMatrix44::IDENTITY;
+		}
 	}
 
 	StarDevice::~StarDevice()
@@ -55,6 +60,57 @@ namespace Star
 		}
 
 		return SR_OK;
+	}
+
+	void StarDevice::DrawTriangle(StarVertexData* pV0, StarVertexData* pV1, StarVertexData* pV2)
+	{
+		StarVector4 wvpPos0, wvpPos1, wvpPos2, homPos0, homPos1, homPos2;
+		StarVector2 ScreenPos0, ScreenPos1, ScreenPos2;
+		wvpPos0 = pV0->pos * m_WVPMatrix;
+		wvpPos1 = pV1->pos * m_WVPMatrix;
+		wvpPos2 = pV2->pos * m_WVPMatrix;
+
+		if (CheckCVV(&wvpPos0) != 0) return;
+		if (CheckCVV(&wvpPos1) != 0) return;
+		if (CheckCVV(&wvpPos2) != 0) return;
+
+		Homoginize(&wvpPos0, &homPos0);
+		Homoginize(&wvpPos1, &homPos1);
+		Homoginize(&wvpPos2, &homPos2);
+
+		ScreenPos0.x = homPos0.x;
+		ScreenPos0.y = homPos0.y;
+		ScreenPos1.x = homPos1.x;
+		ScreenPos1.y = homPos1.y;
+		ScreenPos2.x = homPos2.x;
+		ScreenPos2.y = homPos2.y;
+
+		RasterizeTriangle(&ScreenPos0, &ScreenPos1, &ScreenPos2);
+	}
+	
+	int StarDevice::CheckCVV(StarVector4* pPos)
+	{
+		float w = pPos->w;
+		int check = 0;
+
+		if (pPos->z < 0.0f) check |= 1;
+		if (pPos->z > w)	check |= 2;
+		if (pPos->x < -w)	check |= 4;
+		if (pPos->x > w)	check |= 8;
+		if (pPos->y < -w)	check |= 16;
+		if (pPos->y > w)	check |= 32;
+
+		return check;
+	}
+
+	void StarDevice::Homoginize(const StarVector4* in_pPos, StarVector4* out_pPos)
+	{
+		float rhw = 1.0f / in_pPos->w;
+
+		out_pPos->x = (in_pPos->x * rhw + 1.0f) * m_DeviceParameters.nBackBufferWidth * 0.5f;
+		out_pPos->y = (1.0f - in_pPos->y * rhw) * m_DeviceParameters.nBackBufferHeight * 0.5f;
+		out_pPos->z = in_pPos->x * rhw;
+		out_pPos->w = 1.0f;
 	}
 
 	void StarDevice::RasterizeTriangle(StarVector2* pPos0, StarVector2* pPos1, StarVector2* pPos2)
@@ -241,6 +297,12 @@ namespace Star
 		pColorBuffer->UnlockRect();
 
 		return rltPresent;
+	}
+
+	void StarDevice::SetTransform(EStarTransformStateType eTransformState, StarMatrix44* mat)
+	{
+		m_TransformMatrix[eTransformState] = *mat;
+		m_WVPMatrix = m_TransformMatrix[STST_WORLD] * m_TransformMatrix[STST_VIEW] * m_TransformMatrix[STST_PROJECTION];
 	}
 
 	const StarDevice_Parameters& StarDevice::GetDeviceParameters()
