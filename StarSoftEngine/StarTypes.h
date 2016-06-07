@@ -3,6 +3,7 @@
 
 #include "StarBase.h"
 #include "StarMath.h"
+#include "StarColor.h"
 
 #ifdef WIN32
 
@@ -42,6 +43,19 @@ namespace Star
 	struct StarVertexData
 	{
 		StarVector4 pos;
+		StarColor color;
+	};
+
+	struct StarScanLineVertexData
+	{
+		uint32 nXPos;
+		float32 fZPos;
+		StarColor color;
+	};
+
+	struct StarVSOutput
+	{
+		StarVector4 vPosition;
 	};
 }
 

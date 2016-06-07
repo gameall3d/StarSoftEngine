@@ -17,6 +17,9 @@ namespace Star
 		uint32		m_nColorFloats;
 		uint32		m_nColorBufferPitch;
 
+		float32*	m_pDepthData;
+		uint32		m_nDepthBufferPitch;
+
 		void (StarDevice::*fpRasterizeScanline)(uint32, uint32, uint32);
 		void (StarDevice::*fpDrawPixel)(uint32, uint32);
 	};

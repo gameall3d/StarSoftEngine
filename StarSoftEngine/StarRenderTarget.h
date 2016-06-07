@@ -15,9 +15,13 @@ namespace Star
 		EStarResult SetColorBuffer(StarSurface* in_pColorBuffer);
 		StarSurface* GetColorBuffer();
 
+		EStarResult SetDepthBuffer(StarSurface* in_pDepthBuffer);
+		StarSurface* GetDepthBuffer();
+
 	private:
 		class StarDevice*		m_pDevice;
 		class StarSurface*		m_pColorBuffer;
+		class StarSurface*		m_pDepthBuffer;
 	};
 
 }

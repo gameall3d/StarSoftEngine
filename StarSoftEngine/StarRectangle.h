@@ -1,5 +1,6 @@
 #ifndef __STARRECTANGLE_H_
 #define __STARRECTANGLE_H_
+#include "StarBase.h"
 
 namespace Star
 {

@@ -57,3 +57,5 @@ StarSoftEngine/Debug/vc120.pdb
 StarSoftEngine/Debug/vc120.idb
 *.obj
 StarSoftEngine/Debug/StarSurface.obj
+*.obj
+StarSoftEngine/Debug/StarSoftEngine.Build.CppClean.log

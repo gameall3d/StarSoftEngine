@@ -16,6 +16,7 @@ namespace Star
 
 		EStarResult LockRect(void** out_ppData, const StarRectangle* in_pRect);
 		EStarResult UnlockRect();
+		EStarResult Clear(const StarColor& color, const StarRectangle* pRect);
 
 		uint32 GetFormatFloats();
 		uint32 GetWidth();

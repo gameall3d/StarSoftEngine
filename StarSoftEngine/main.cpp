@@ -9,6 +9,7 @@
 #include "StarSurface.h"
 #include "StarTypes.h"
 #include "Star3D.h"
+#include "StarColor.h"
 
 using namespace Star;
 
@@ -30,10 +31,23 @@ StarVertexData* WorldPos0;
 StarVertexData* WorldPos1;
 StarVertexData* WorldPos2;
 
+StarVertexData mesh[8] =
+{
+	{ { 1, -1, 1, 1 }, { 1.0f, 0.2f, 0.2f } },
+	{ { -1, -1, 1, 1 }, { 0.2f, 1.0f, 0.2f } },
+	{ { -1, 1, 1, 1 }, { 0.2f, 0.2f, 1.0f } },
+	{ { 1, 1, 1, 1 }, { 1.0f, 0.2f, 1.0f } },
+	{ { 1, -1, -1, 1 }, { 1.0f, 1.0f, 0.2f } },
+	{ { -1, -1, -1, 1 }, { 0.2f, 1.0f, 1.0f } },
+	{ { -1, 1, -1, 1 }, { 1.0f, 0.3f, 0.3f } },
+	{ { 1, 1, -1, 1 }, { 0.2f, 1.0f, 0.3f } },
+};
+
 // Test Device
 Star3D*		pStar3D;
 StarDevice* pDevice;
 StarSurface* pColorBuffer;
+StarSurface* pDepthBuffer;
 StarRenderTarget* pRenderTarget;
 
 
@@ -194,6 +208,10 @@ void InitData()
 	WorldPos1->pos = StarVector4(-1, -1, 1, 1);
 	WorldPos2->pos = StarVector4(-1, 1, 1, 1);
 
+	WorldPos0->color = StarColor::Red;
+	WorldPos1->color = StarColor::Green;
+	WorldPos2->color = StarColor::Blue;
+
 	StarDevice_Parameters deviceParam;
 	deviceParam.hDeviceWindow = hWnd;
 	deviceParam.bWindowed = true;
@@ -208,18 +226,40 @@ void InitData()
 	pDevice->SetRenderTarget(pRenderTarget);
 	pRenderTarget->SetColorBuffer(pColorBuffer);
 
+	pDevice->CreateSurface(&pDepthBuffer, ScreenWidth, ScreenHeight, CFMT_R32);
+	pRenderTarget->SetDepthBuffer(pDepthBuffer);
+	pDepthBuffer->Clear(StarColor(1, 0, 0, 0), NULL);
+
 	float aspect = (float32)ScreenWidth / ScreenHeight;
-	StarVector3 eyePos(0.0f, 0.0f, -15.0f);
+	StarVector3 eyePos(-1.0f, 2.0f, -5.0f);
 	StarVector3 lookatPos(0.0f, 0.0f, 0.0f);
 	StarVector3 upDir(0.0f, 1.0f, 0.0f);
 
 	StarMatrix44 matView;
 	matView = StarMatrix44::BuildMatrixLookAtLH(eyePos, lookatPos, upDir);
-	pDevice->SetTransform(STST_WORLD, &matView);
+	pDevice->SetTransform(STST_VIEW, &matView);
 
 	StarMatrix44 matProj;
 	matProj = StarMatrix44::BuildMatrixPerspectiveFOVLH(STAR_PI / 3, aspect, 1.0f, 100.0f);
 	pDevice->SetTransform(STST_PROJECTION, &matProj);
+}
+
+void DrawPlane(uint32 a, uint32 b, uint32 c, uint32 d)
+{
+	StarVertexData p0 = mesh[a], p1 = mesh[b], p2 = mesh[c], p3 = mesh[d];
+
+	pDevice->DrawTriangle(&p0, &p1, &p2);
+	pDevice->DrawTriangle(&p2, &p3, &p0);
+}
+
+void DrawBox()
+{
+	DrawPlane(0, 1, 2, 3);
+	DrawPlane(4, 5, 6, 7);
+	DrawPlane(0, 4, 5, 1);
+	//DrawPlane(1, 5, 6, 2);
+	//DrawPlane(2, 6, 7, 3);
+	//DrawPlane(3, 7, 4, 0);
 }
 
 // ÊµÊ±äÖÈ¾
@@ -227,8 +267,9 @@ void Render()
 {
 	pDevice->PreRender();
 	//pDevice->RasterizeTriangle(Pos0, Pos1, Pos2);
-	pDevice->DrawTriangle(WorldPos0, WorldPos1, WorldPos2);
-
+	//pDevice->DrawTriangle(WorldPos0, WorldPos1, WorldPos2);
+	DrawBox();
+	//DrawPlane(0, 1, 2, 3);
 	pDevice->PostRender();
 
 	pDevice->Present(pRenderTarget);

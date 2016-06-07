@@ -6,6 +6,7 @@
 #define  OutputDebugString printf
 #else
 #include <windows.h>
+#include <assert.h>
 #endif
 
 namespace Star

@@ -24,6 +24,19 @@ namespace Star
 	{
 		return m_pColorBuffer;
 	}
+
+	EStarResult StarRenderTarget::SetDepthBuffer(StarSurface* in_pDepthBuffer)
+	{
+		SAFE_DELETE(m_pDepthBuffer);
+		m_pDepthBuffer = in_pDepthBuffer;
+
+		return SR_OK;
+	}
+
+	StarSurface* StarRenderTarget::GetDepthBuffer()
+	{
+		return m_pDepthBuffer;
+	}
 }
 
 

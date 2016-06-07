@@ -35,6 +35,7 @@ namespace Star
 			return SR_FAILED;
 		}
 
+		m_eColorFormat = eColorFormat;
 		m_nWidth = nWidth;
 		m_nHeight = nHeight;
 
@@ -69,6 +70,7 @@ namespace Star
 			return SR_OK;
 		}
 
+		return SR_OK;
 	}
 
 	EStarResult StarSurface::UnlockRect()
@@ -78,6 +80,50 @@ namespace Star
 			m_bLocked = false;
 			return SR_OK;
 		}
+
+		return SR_FAILED;
+	}
+
+	EStarResult StarSurface::Clear(const StarColor& color, const StarRectangle* pRect)
+	{
+		StarRectangle clearRect;
+		if (pRect)
+		{
+			clearRect = *pRect;
+		}
+		else
+		{
+			clearRect.nLeft = 0;
+			clearRect.nTop = 0;
+			clearRect.nRight = m_nWidth;
+			clearRect.nBottom = m_nHeight;
+		}
+		float32* pData;
+
+		EStarResult rltPointer = LockRect((void**)&pData, 0);
+
+		const uint32 nBridgeStep = (m_nWidth - clearRect.nRight) + clearRect.nLeft;
+
+		switch (m_eColorFormat)
+		{
+		case CFMT_R32:
+			{
+						 float32* pCurData = &pData[clearRect.nTop * m_nWidth + clearRect.nLeft];
+						 for (uint32 nY = clearRect.nTop; nY < clearRect.nBottom; ++nY, pCurData += nBridgeStep)
+						 {
+							 for (uint32 nX = clearRect.nLeft; nX < clearRect.nRight; ++nX, ++pCurData)
+							 {
+								 *pCurData = color.r;
+							 }
+						 }
+			}
+			break;
+		default:
+			break;
+		}
+
+		UnlockRect();
+		return SR_OK;
 	}
 
 	uint32 StarSurface::GetFormatFloats()

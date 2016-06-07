@@ -26,8 +26,9 @@ namespace Star
 		void DrawTriangle(StarVertexData* pV0, StarVertexData* pV1, StarVertexData* pV2);
 		int32 CheckCVV(StarVector4* pPos);
 		void Homoginize(const StarVector4* in_pPos, StarVector4* out_pPos);
-		void RasterizeTriangle(StarVector2* pPos0, StarVector2* pPos1, StarVector2* pPos2);
-		void RasterizeScanline(int32 nYPos, int32 nStartXPos, int32 nEndXpos);
+		void RasterizeTriangle(StarVertexData* pPos0, StarVertexData* pPos1, StarVertexData* pPos2);
+		void RasterizeScanline(int32 nYPos, int32 nStartXPos, int32 nEndXpos, StarColor startColor, StarColor endColor);
+		void RasterizeScanline(int32 nYPos, StarScanLineVertexData* pStartVD, StarScanLineVertexData* pEndVD);
 
 		void SetTransform(EStarTransformStateType eTransformState, StarMatrix44* mat);
 
