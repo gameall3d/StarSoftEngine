@@ -228,10 +228,10 @@ void InitData()
 
 	pDevice->CreateSurface(&pDepthBuffer, ScreenWidth, ScreenHeight, CFMT_R32);
 	pRenderTarget->SetDepthBuffer(pDepthBuffer);
-	pDepthBuffer->Clear(StarColor(1, 0, 0, 0), NULL);
+	pDepthBuffer->Clear(StarColor(2, 0, 0, 0), NULL);
 
 	float aspect = (float32)ScreenWidth / ScreenHeight;
-	StarVector3 eyePos(-1.0f, 2.0f, -5.0f);
+	StarVector3 eyePos(2.0f, 2.0f, -5.0f);
 	StarVector3 lookatPos(0.0f, 0.0f, 0.0f);
 	StarVector3 upDir(0.0f, 1.0f, 0.0f);
 
@@ -257,9 +257,9 @@ void DrawBox()
 	DrawPlane(0, 1, 2, 3);
 	DrawPlane(4, 5, 6, 7);
 	DrawPlane(0, 4, 5, 1);
-	//DrawPlane(1, 5, 6, 2);
-	//DrawPlane(2, 6, 7, 3);
-	//DrawPlane(3, 7, 4, 0);
+	DrawPlane(1, 5, 6, 2);
+	DrawPlane(2, 6, 7, 3);
+	DrawPlane(3, 7, 4, 0);
 }
 
 //  µ ±‰÷»æ

@@ -96,7 +96,8 @@ namespace Star
 		wvpVD1.color = pV1->color;
 		wvpVD2.color = pV2->color;
 
-		RasterizeTriangle(&wvpVD0, &wvpVD1, &wvpVD2);
+		//RasterizeTriangle(&wvpVD0, &wvpVD1, &wvpVD2);
+		RasterizeTriangleSimple(&wvpVD0, &wvpVD1, &wvpVD2);
 	}
 	
 	int StarDevice::CheckCVV(StarVector4* pPos)
@@ -278,6 +279,7 @@ namespace Star
 				break;
 			}
 
+			int curY = nStartY;
 			for (; nStartY < nEndY; nStartY++, fLeftEdge += fDeltaXLeft, fRightEdge += fDeltaXRight, 
 				leftColor += fDeltaColorLeft, rightColor += fDeltaColorRight,
 				fLeftZ += fDeltaZLeft, fRightZ += fDeltaZRight)
@@ -299,6 +301,144 @@ namespace Star
 			}
 
 		} // end of two parts for loop
+	}
+
+	void StarDevice::RasterizeTriangleSimple(StarVertexData* pPos0, StarVertexData* pPos1, StarVertexData* pPos2)
+	{
+		// sort Position by y
+		const StarVertexData* pVertices[3] = { pPos0, pPos1, pPos2 };
+
+		if (pPos1->pos.y < pVertices[0]->pos.y)
+		{
+			pVertices[1] = pVertices[0];
+			pVertices[0] = pPos1;
+		}
+		if (pPos2->pos.y < pVertices[0]->pos.y)
+		{
+			pVertices[2] = pVertices[1];
+			pVertices[1] = pVertices[0];
+			pVertices[0] = pPos2;
+		}
+		else if (pPos2->pos.y < pVertices[1]->pos.y)
+		{
+			pVertices[2] = pVertices[1];
+			pVertices[1] = pPos2;
+		}
+
+		const StarVector4& vP0 = pVertices[0]->pos;
+		const StarVector4& vP1 = pVertices[1]->pos;
+		const StarVector4& vP2 = pVertices[2]->pos;
+
+		// reciprocal of slope. 1/(dy/dx)
+		float fRecDp0p1, fRecDp0p2;
+
+		if (vP1.y - vP0.y > 0)
+			fRecDp0p1 = (vP1.x - vP0.x) / (vP1.y - vP0.y);
+		else
+			fRecDp0p1 = 0;
+
+		if (vP2.y - vP0.y > 0)
+			fRecDp0p2 = (vP2.x - vP0.x) / (vP2.y - vP0.y);
+		else
+			fRecDp0p2 = 0;
+
+		// First case where triangles are like that:
+		// P1
+		// -
+		// -- 
+		// - -
+		// -  -
+		// -   - P2
+		// -  -
+		// - -
+		// -
+		// P3
+
+		if (fRecDp0p1 > fRecDp0p2)
+		{
+			for (int y = (int)vP0.y; y <= (int)vP2.y; y++)
+			{
+				if (y < vP1.y)
+				{
+					ProcessScanLine(y, pVertices[0], pVertices[2], pVertices[0], pVertices[1]);
+				}
+				else
+				{
+					ProcessScanLine(y, pVertices[0], pVertices[2], pVertices[1], pVertices[2]);
+				}
+			}
+		}
+		// else case where triangles are like that:
+		//       P1
+		//        -
+		//       -- 
+		//      - -
+		//     -  -
+		// P2 -   - 
+		//     -  -
+		//      - -
+		//        -
+		//       P3
+		else
+		{
+			for (int y = (int)vP0.y; y <= (int)vP2.y; y++)
+			{
+				if (y < vP1.y)
+				{
+					ProcessScanLine(y, pVertices[0], pVertices[1], pVertices[0], pVertices[2]);
+				}
+				else
+				{
+					ProcessScanLine(y, pVertices[1], pVertices[2], pVertices[0], pVertices[2]);
+				}
+			}
+		}
+	}
+
+	// drawing line between 2 points from left to right
+	// pApB -> pCpD
+	void StarDevice::ProcessScanLine(int32 nYPos, const StarVertexData* pAVD, const StarVertexData* pBVD, const StarVertexData* pCVD, const StarVertexData* pDVD)
+	{
+		float32 fGradientLeft = pAVD->pos.y != pBVD->pos.y ? (nYPos - pAVD->pos.y) / (pBVD->pos.y - pAVD->pos.y) : 1;
+		float32 fGradientRight = pCVD->pos.y != pDVD->pos.y ? (nYPos - pCVD->pos.y) / (pDVD->pos.y - pCVD->pos.y) : 1;
+
+		int32 nStartXPos = (int32)StarMath::Interpolate(pAVD->pos.x, pBVD->pos.x, fGradientLeft);
+		int32 nEndXPos = (int32)StarMath::Interpolate(pCVD->pos.x, pDVD->pos.x, fGradientRight);
+
+		float32* pFrameData = m_pRenderInfo->m_pFrameData + (nYPos * m_pRenderInfo->m_nColorBufferPitch + nStartXPos * m_pRenderInfo->m_nColorFloats);
+		float32* pDepthData = m_pRenderInfo->m_pDepthData + (nYPos * m_pRenderInfo->m_nDepthBufferPitch + nStartXPos);
+
+		// for color
+		StarColor StartColor = StarMath::Interpolate(pAVD->color, pBVD->color, fGradientLeft);
+		StarColor EndColor = StarMath::Interpolate(pCVD->color, pDVD->color, fGradientRight);
+		StarColor pixelColor = StartColor;
+		StarColor deltaColor = nEndXPos != nStartXPos ? (EndColor - StartColor) / (float32)(nEndXPos - nStartXPos): StarColor::ZERO;
+
+		// for depth
+		float32 fZLeft = StarMath::Interpolate(pAVD->pos.z, pBVD->pos.z, fGradientLeft);
+		float32 fZRight = StarMath::Interpolate(pCVD->pos.z, pDVD->pos.z, fGradientRight);
+		float32 fZDelta = nEndXPos != nStartXPos ? (fZRight - fZLeft) / (float32)(nEndXPos - nStartXPos) : 0;
+		float32 fDepth = fZLeft;
+
+		for (int32 nXPos = nStartXPos; nXPos < nEndXPos; nXPos++, pFrameData += m_pRenderInfo->m_nColorFloats, pixelColor+= deltaColor, pDepthData++, fDepth += fZDelta)
+		{
+			if (fDepth < *pDepthData)
+			{
+				*pDepthData = fDepth;
+			}
+			else
+			{
+				continue;
+			}
+
+			switch (m_pRenderInfo->m_nColorFloats)
+			{
+			case 4:pFrameData[3] = pixelColor.a;
+			case 3:pFrameData[2] = pixelColor.b;
+			case 2:pFrameData[1] = pixelColor.g;
+			case 1:pFrameData[0] = pixelColor.r;
+			}
+		}
 	}
 
 	void StarDevice::RasterizeScanline(int32 nYPos, int32 nStartXPos, int32 nEndXpos, StarColor startColor, StarColor endColor)

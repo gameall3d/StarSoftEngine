@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <algorithm>
 #include "StarPrerequisites.h"
+#include "StarColor.h"
 
 
 #define  STAR_PI 3.141592654f
@@ -21,6 +22,16 @@ namespace Star
 		}
 
 		static inline float32 Sqrt(float32 fValue) { return sqrt(fValue);  }
+
+		static inline float32 Interpolate(float32 fMin, float32 fMax, float32 fGradient)
+		{
+			return fMin + (fMax - fMin) * Clamp<float32>(fGradient, 0, 1);
+		}
+
+		static inline StarColor Interpolate(const StarColor& StartColor, const StarColor& EndColor, float32 fGradient)
+		{
+			return StartColor + (EndColor - StartColor) * Clamp<float32>(fGradient, 0, 1);
+		}
 	};
 }
 
