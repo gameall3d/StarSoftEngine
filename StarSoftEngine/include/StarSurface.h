@@ -18,6 +18,8 @@ namespace Star
 		EStarResult UnlockRect();
 		EStarResult Clear(const StarColor& color, const StarRectangle* pRect);
 
+		void SamplePoint(StarColor& out_Color, float32 fU, float32 fV);
+
 		uint32 GetFormatFloats();
 		uint32 GetWidth();
 		uint32 GetHeight();
@@ -29,6 +31,8 @@ namespace Star
 		uint32				m_nFormatFloats;
 		uint32				m_nWidth;
 		uint32				m_nHeight;
+		uint32				m_nWidthMin1;	// m_nWidth - 1, for texture sample
+		uint32				m_nHeightMin1;  // m_nHeight - 1, for texture sample
 
 		bool			m_bLocked;
 		StarRectangle	m_PartialLockRect;

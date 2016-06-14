@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "StarPrerequisites.h"
 #include "StarColor.h"
+#include "StarVector2.h"
 
 
 #define  STAR_PI 3.141592654f
@@ -31,6 +32,11 @@ namespace Star
 		static inline StarColor Interpolate(const StarColor& StartColor, const StarColor& EndColor, float32 fGradient)
 		{
 			return StartColor + (EndColor - StartColor) * Clamp<float32>(fGradient, 0, 1);
+		}
+
+		static inline StarVector2 Interpolate(const StarVector2& StartPos, const StarVector2& EndPos, float32 fGradient)
+		{
+			return StartPos + (EndPos - StartPos) * Clamp<float32>(fGradient, 0, 1);
 		}
 	};
 }

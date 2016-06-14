@@ -18,6 +18,8 @@ namespace Star
 
 	public:
 		EStarResult CreateSurface(StarSurface** out_ppSurface, uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat);
+		EStarResult CreateTexture(StarTexture** out_ppTexture, uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat);
+		EStarResult SetTexture(uint32 nSamplerNum, StarTexture* pTexture);
 
 		EStarResult PreRender();
 		EStarResult Present(StarRenderTarget* in_pRenderTarget);
@@ -44,6 +46,7 @@ namespace Star
 		StarPresentTarget* m_pPresentTarget;
 		StarRenderTarget* m_pRenderTarget;
 		StarRenderInfo* m_pRenderInfo;
+		StarTexture*	m_pTexture;
 
 		StarMatrix44 m_TransformMatrix[STST_NUM];
 		StarMatrix44 m_WVPMatrix;

@@ -38,6 +38,8 @@ namespace Star
 		m_eColorFormat = eColorFormat;
 		m_nWidth = nWidth;
 		m_nHeight = nHeight;
+		m_nWidthMin1 = nWidth - 1;
+		m_nHeightMin1 = nHeight - 1;
 
 		m_pData = new float[m_nWidth * m_nHeight * m_nFormatFloats];
 
@@ -118,12 +120,46 @@ namespace Star
 						 }
 			}
 			break;
+		case CFMT_R32G32B32A32:
+			{
+								  StarColor* pCurData = &((StarColor*)pData)[clearRect.nTop * m_nWidth + clearRect.nLeft];
+								  for (uint32 nY = clearRect.nTop; nY < clearRect.nBottom; ++nY, ++pCurData)
+								  {
+									  *pCurData = color;
+								  }
+			}
 		default:
 			break;
 		}
 
 		UnlockRect();
 		return SR_OK;
+	}
+
+	void StarSurface::SamplePoint(StarColor& out_Color, float32 fU, float32 fV)
+	{
+		const float32 fX = fU * m_nWidthMin1;
+		const float32 fY = fV * m_nHeightMin1;
+		const uint32 nPixelX = ftol(fX);
+		const uint32 nPixelY = ftol(fY);
+
+		switch (m_eColorFormat)
+		{
+		case Star::CFMT_R32:
+			break;
+		case Star::CFMT_R32G32:
+			break;
+		case Star::CFMT_R32G32B32:
+			break;
+		case Star::CFMT_R32G32B32A32:
+		{
+										const StarColor* pPixel = (const StarColor*)&m_pData[4 * (nPixelY * m_nWidth + nPixelX)];
+										out_Color = *pPixel;
+										break;
+		}
+		default:
+			break;
+		}
 	}
 
 	uint32 StarSurface::GetFormatFloats()

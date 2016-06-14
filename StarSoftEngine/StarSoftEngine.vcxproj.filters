@@ -15,90 +15,99 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarSurface.cpp">
+    <ClCompile Include="src\Star3D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarRectangle.cpp">
+    <ClCompile Include="src\StarColor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarRenderTarget.cpp">
+    <ClCompile Include="src\StarDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarRenderInfo.cpp">
+    <ClCompile Include="src\StarMatrix44.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarDevice.cpp">
+    <ClCompile Include="src\StarPresentTarget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarColor.cpp">
+    <ClCompile Include="src\StarRectangle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Star3D.cpp">
+    <ClCompile Include="src\StarRenderInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarPresentTarget.cpp">
+    <ClCompile Include="src\StarRenderTarget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarVector3.cpp">
+    <ClCompile Include="src\StarSurface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarMatrix44.cpp">
+    <ClCompile Include="src\StarVector3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StarVector4.cpp">
+    <ClCompile Include="src\StarVector4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StarTexture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StarVector2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="StarRectangle.h">
+    <ClInclude Include="include\Star3D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarSurface.h">
+    <ClInclude Include="include\StarBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarVector2.h">
+    <ClInclude Include="include\StarColor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarBase.h">
+    <ClInclude Include="include\StarDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarDevice.h">
+    <ClInclude Include="include\StarMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarRenderTarget.h">
+    <ClInclude Include="include\StarMatrix44.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarPrerequisites.h">
+    <ClInclude Include="include\StarPrerequisites.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarRenderInfo.h">
+    <ClInclude Include="include\StarPresentTarget.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarColor.h">
+    <ClInclude Include="include\StarRectangle.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarMath.h">
+    <ClInclude Include="include\StarRenderInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Star3D.h">
+    <ClInclude Include="include\StarRenderTarget.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarTypes.h">
+    <ClInclude Include="include\StarSurface.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarPresentTarget.h">
+    <ClInclude Include="include\StarTypes.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarVector3.h">
+    <ClInclude Include="include\StarVector2.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarMatrix44.h">
+    <ClInclude Include="include\StarVector3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StarVector4.h">
+    <ClInclude Include="include\StarVector4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StarTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -44,6 +44,7 @@ namespace Star
 	{
 		StarVector4 pos;
 		StarColor color;
+		StarVector2 UV;
 	};
 
 	struct StarScanLineVertexData

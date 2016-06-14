@@ -10,6 +10,7 @@
 #include "StarTypes.h"
 #include "Star3D.h"
 #include "StarColor.h"
+#include "StarTexture.h"
 
 using namespace Star;
 
@@ -33,14 +34,14 @@ StarVertexData* WorldPos2;
 
 StarVertexData mesh[8] =
 {
-	{ { 1, -1, 1, 1 }, { 1.0f, 0.2f, 0.2f } },
-	{ { -1, -1, 1, 1 }, { 0.2f, 1.0f, 0.2f } },
-	{ { -1, 1, 1, 1 }, { 0.2f, 0.2f, 1.0f } },
-	{ { 1, 1, 1, 1 }, { 1.0f, 0.2f, 1.0f } },
-	{ { 1, -1, -1, 1 }, { 1.0f, 1.0f, 0.2f } },
-	{ { -1, -1, -1, 1 }, { 0.2f, 1.0f, 1.0f } },
-	{ { -1, 1, -1, 1 }, { 1.0f, 0.3f, 0.3f } },
-	{ { 1, 1, -1, 1 }, { 0.2f, 1.0f, 0.3f } },
+	{ {  1, -1,  1, 1 }, { 1.0f, 0.2f, 0.2f }, { 0, 0 } },
+	{ { -1, -1,  1, 1 }, { 0.2f, 1.0f, 0.2f }, { 0, 1 } },
+	{ { -1,  1,  1, 1 }, { 0.2f, 0.2f, 1.0f }, { 1, 1 } },
+	{ {  1,  1,  1, 1 }, { 1.0f, 0.2f, 1.0f }, { 1, 0 } },
+	{ {  1, -1, -1, 1 }, { 1.0f, 1.0f, 0.2f }, { 0, 0 } },
+	{ { -1, -1, -1, 1 }, { 0.2f, 1.0f, 1.0f }, { 0, 1 } },
+	{ { -1,  1, -1, 1 }, { 1.0f, 0.3f, 0.3f }, { 1, 1 } },
+	{ {  1,  1, -1, 1 }, { 0.2f, 1.0f, 0.3f }, { 1, 0 } },
 };
 
 // Test Device
@@ -147,7 +148,7 @@ static BOOL InitWindow(HINSTANCE hInstance, int nCmdShow)
 	RegisterClass(&wc);
 
 	// ´´½¨´°¿Ú
-	hWnd = CreateWindowEx(0, TEXT("RenderWindow"), TEXT("DirectDraw Demo"), iWindowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
+	hWnd = CreateWindowEx(0, TEXT("RenderWindow"), TEXT("StarSoftRender Demo"), iWindowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
 		(rc.right - rc.left),	
 		(rc.bottom - rc.top),
 		NULL,
@@ -230,6 +231,28 @@ void InitData()
 	pRenderTarget->SetDepthBuffer(pDepthBuffer);
 	pDepthBuffer->Clear(StarColor(2, 0, 0, 0), NULL);
 
+	// create texture
+	StarTexture* pTexture;
+	float32* pTextureData;
+	pDevice->CreateTexture(&pTexture, 256, 256, CFMT_R32G32B32A32);
+	pTexture->LockRect((void**)&pTextureData, NULL);
+
+	// manual init texture data
+	for (int i = 0; i < 256; i++)
+	{
+		for (int j = 0; j < 256; j++)
+		{
+			int x = i / 32;
+			int y = j / 32;
+			StarColor* pCurData = (StarColor*)&pTextureData[4 * (i * 256 + j)];
+			*pCurData = ((x + y) & 1) ? StarColor::White : StarColor::Blue;
+		}
+	}
+
+	pTexture->UnlockRect();
+
+	pDevice->SetTexture(0, pTexture);
+
 	float aspect = (float32)ScreenWidth / ScreenHeight;
 	StarVector3 eyePos(2.0f, 2.0f, -5.0f);
 	StarVector3 lookatPos(0.0f, 0.0f, 0.0f);
@@ -247,6 +270,9 @@ void InitData()
 void DrawPlane(uint32 a, uint32 b, uint32 c, uint32 d)
 {
 	StarVertexData p0 = mesh[a], p1 = mesh[b], p2 = mesh[c], p3 = mesh[d];
+
+	p0.UV.x = 0, p0.UV.y = 0, p1.UV.x = 0, p1.UV.y = 1;
+	p2.UV.x = 1, p2.UV.y = 1, p3.UV.x = 1, p3.UV.y = 0;
 
 	pDevice->DrawTriangle(&p0, &p1, &p2);
 	pDevice->DrawTriangle(&p2, &p3, &p0);

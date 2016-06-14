@@ -53,6 +53,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>H:\LearnProject\C++_Project\StarSoftEngine\StarSoftEngine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,36 +79,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Star3D.cpp" />
-    <ClCompile Include="StarColor.cpp" />
-    <ClCompile Include="StarDevice.cpp" />
-    <ClCompile Include="StarMatrix44.cpp" />
-    <ClCompile Include="StarPresentTarget.cpp" />
-    <ClCompile Include="StarRectangle.cpp" />
-    <ClCompile Include="StarRenderInfo.cpp" />
-    <ClCompile Include="StarRenderTarget.cpp" />
-    <ClCompile Include="StarSurface.cpp" />
-    <ClCompile Include="StarVector3.cpp" />
-    <ClCompile Include="StarVector4.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Star3D.cpp" />
+    <ClCompile Include="src\StarColor.cpp" />
+    <ClCompile Include="src\StarDevice.cpp" />
+    <ClCompile Include="src\StarMatrix44.cpp" />
+    <ClCompile Include="src\StarPresentTarget.cpp" />
+    <ClCompile Include="src\StarRectangle.cpp" />
+    <ClCompile Include="src\StarRenderInfo.cpp" />
+    <ClCompile Include="src\StarRenderTarget.cpp" />
+    <ClCompile Include="src\StarSurface.cpp" />
+    <ClCompile Include="src\StarTexture.cpp" />
+    <ClCompile Include="src\StarVector2.cpp" />
+    <ClCompile Include="src\StarVector3.cpp" />
+    <ClCompile Include="src\StarVector4.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Star3D.h" />
-    <ClInclude Include="StarBase.h" />
-    <ClInclude Include="StarColor.h" />
-    <ClInclude Include="StarDevice.h" />
-    <ClInclude Include="StarMath.h" />
-    <ClInclude Include="StarMatrix44.h" />
-    <ClInclude Include="StarPrerequisites.h" />
-    <ClInclude Include="StarPresentTarget.h" />
-    <ClInclude Include="StarRectangle.h" />
-    <ClInclude Include="StarRenderInfo.h" />
-    <ClInclude Include="StarRenderTarget.h" />
-    <ClInclude Include="StarSurface.h" />
-    <ClInclude Include="StarTypes.h" />
-    <ClInclude Include="StarVector2.h" />
-    <ClInclude Include="StarVector3.h" />
-    <ClInclude Include="StarVector4.h" />
+    <ClInclude Include="include\Star3D.h" />
+    <ClInclude Include="include\StarBase.h" />
+    <ClInclude Include="include\StarColor.h" />
+    <ClInclude Include="include\StarDevice.h" />
+    <ClInclude Include="include\StarMath.h" />
+    <ClInclude Include="include\StarMatrix44.h" />
+    <ClInclude Include="include\StarPrerequisites.h" />
+    <ClInclude Include="include\StarPresentTarget.h" />
+    <ClInclude Include="include\StarRectangle.h" />
+    <ClInclude Include="include\StarRenderInfo.h" />
+    <ClInclude Include="include\StarRenderTarget.h" />
+    <ClInclude Include="include\StarSurface.h" />
+    <ClInclude Include="include\StarTexture.h" />
+    <ClInclude Include="include\StarTypes.h" />
+    <ClInclude Include="include\StarVector2.h" />
+    <ClInclude Include="include\StarVector3.h" />
+    <ClInclude Include="include\StarVector4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

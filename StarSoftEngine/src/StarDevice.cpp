@@ -5,6 +5,7 @@
 #include "StarColor.h"
 #include "StarRenderTarget.h"
 #include "StarPresentTarget.h"
+#include "StarTexture.h"
 
 namespace Star
 {
@@ -62,6 +63,32 @@ namespace Star
 		return SR_OK;
 	}
 
+	EStarResult StarDevice::CreateTexture(StarTexture** out_ppTexture, uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat)
+	{
+		if (!out_ppTexture)
+		{
+			return SR_FAILED;
+		}
+
+		*out_ppTexture = new StarTexture(this);
+
+		if (!(*out_ppTexture))
+		{
+			return SR_FAILED;
+		}
+
+		EStarResult rltCreateTexture = (*out_ppTexture)->Create(nWidth, nHeight, eColorFormat);
+
+		return rltCreateTexture;
+	}
+
+	EStarResult StarDevice::SetTexture(uint32 nSamplerNum, StarTexture* pTexture)
+	{
+		m_pTexture = pTexture;
+
+		return SR_OK;
+	}
+
 	void StarDevice::DrawTriangle(StarVertexData* pV0, StarVertexData* pV1, StarVertexData* pV2)
 	{
 		StarVector4 wvpPos0, wvpPos1, wvpPos2, homPos0, homPos1, homPos2;
@@ -95,6 +122,10 @@ namespace Star
 		wvpVD0.color = pV0->color;
 		wvpVD1.color = pV1->color;
 		wvpVD2.color = pV2->color;
+
+		wvpVD0.UV = pV0->UV;
+		wvpVD1.UV = pV1->UV;
+		wvpVD2.UV = pV2->UV;
 
 		//RasterizeTriangle(&wvpVD0, &wvpVD1, &wvpVD2);
 		RasterizeTriangleSimple(&wvpVD0, &wvpVD1, &wvpVD2);
@@ -420,7 +451,18 @@ namespace Star
 		float32 fZDelta = nEndXPos != nStartXPos ? (fZRight - fZLeft) / (float32)(nEndXPos - nStartXPos) : 0;
 		float32 fDepth = fZLeft;
 
-		for (int32 nXPos = nStartXPos; nXPos < nEndXPos; nXPos++, pFrameData += m_pRenderInfo->m_nColorFloats, pixelColor+= deltaColor, pDepthData++, fDepth += fZDelta)
+		// for UV
+		StarVector2 StartUV = StarMath::Interpolate(pAVD->UV, pBVD->UV, fGradientLeft);
+		StarVector2 EndUV = StarMath::Interpolate(pCVD->UV, pDVD->UV, fGradientRight);
+		StarVector2 CurUV = StartUV;
+		StarVector2 deltaUV = nEndXPos != nStartXPos ? (EndUV - StartUV) / (float32)(nEndXPos - nStartXPos) : StarVector2::ZERO;
+		StarColor textureColor;
+		if (m_pTexture)
+			m_pTexture->SampleTexture(textureColor, CurUV.x, CurUV.y);
+
+		for (int32 nXPos = nStartXPos; nXPos < nEndXPos; 
+			nXPos++, pFrameData += m_pRenderInfo->m_nColorFloats, pixelColor+= deltaColor, pDepthData++, fDepth += fZDelta,
+			CurUV += deltaUV)
 		{
 			if (fDepth < *pDepthData)
 			{
@@ -431,13 +473,26 @@ namespace Star
 				continue;
 			}
 
-			switch (m_pRenderInfo->m_nColorFloats)
+			if (m_pTexture)
 			{
-			case 4:pFrameData[3] = pixelColor.a;
-			case 3:pFrameData[2] = pixelColor.b;
-			case 2:pFrameData[1] = pixelColor.g;
-			case 1:pFrameData[0] = pixelColor.r;
+				m_pTexture->SampleTexture(textureColor, CurUV.x, CurUV.y);
+				switch (m_pRenderInfo->m_nColorFloats)
+				{
+				case 4:pFrameData[3] = textureColor.a;
+				case 3:pFrameData[2] = textureColor.b;
+				case 2:pFrameData[1] = textureColor.g;
+				case 1:pFrameData[0] = textureColor.r;
+				}
 			}
+
+
+// 			switch (m_pRenderInfo->m_nColorFloats)
+// 			{
+// 			case 4:pFrameData[3] = pixelColor.a;
+// 			case 3:pFrameData[2] = pixelColor.b;
+// 			case 2:pFrameData[1] = pixelColor.g;
+// 			case 1:pFrameData[0] = pixelColor.r;
+// 			}
 		}
 	}
 

@@ -9,6 +9,7 @@ namespace Star
 	class StarSurface;
 	class StarRenderInfo;
 	class StarPresentTarget;
+	class StarTexture;
 
 	class StarRectangle;
 	class StarVector2;
