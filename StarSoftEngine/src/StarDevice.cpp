@@ -116,9 +116,9 @@ namespace Star
 		wvpVD0.pos = homPos0;
 		wvpVD1.pos = homPos1;
 		wvpVD2.pos = homPos2;
-//		wvpVD0.pos.z = wvpPos0.w;
-//		wvpVD1.pos.z = wvpPos1.w;
-//		wvpVD2.pos.z = wvpPos2.w;
+		wvpVD0.pos.z = 1 / wvpPos0.w;	// use 1/z instead of z
+		wvpVD1.pos.z = 1 / wvpPos1.w;	// use 1/z instead of z
+		wvpVD2.pos.z = 1 / wvpPos2.w;	// use 1/z instead of z
 		wvpVD0.color = pV0->color;
 		wvpVD1.color = pV1->color;
 		wvpVD2.color = pV2->color;
@@ -452,19 +452,19 @@ namespace Star
 		float32 fDepth = fZLeft;
 
 		// for UV
-		StarVector2 StartUV = StarMath::Interpolate(pAVD->UV, pBVD->UV, fGradientLeft);
-		StarVector2 EndUV = StarMath::Interpolate(pCVD->UV, pDVD->UV, fGradientRight);
+		StarVector2 StartUV = StarMath::Interpolate(pAVD->UV * pAVD->pos.z, pBVD->UV * pBVD->pos.z, fGradientLeft);
+		StarVector2 EndUV = StarMath::Interpolate(pCVD->UV * pCVD->pos.z, pDVD->UV * pDVD->pos.z, fGradientRight);
 		StarVector2 CurUV = StartUV;
 		StarVector2 deltaUV = nEndXPos != nStartXPos ? (EndUV - StartUV) / (float32)(nEndXPos - nStartXPos) : StarVector2::ZERO;
 		StarColor textureColor;
 		if (m_pTexture)
-			m_pTexture->SampleTexture(textureColor, CurUV.x, CurUV.y);
+			m_pTexture->SampleTexture(textureColor, CurUV.x / fDepth, CurUV.y / fDepth);
 
 		for (int32 nXPos = nStartXPos; nXPos < nEndXPos; 
 			nXPos++, pFrameData += m_pRenderInfo->m_nColorFloats, pixelColor+= deltaColor, pDepthData++, fDepth += fZDelta,
 			CurUV += deltaUV)
 		{
-			if (fDepth < *pDepthData)
+			if (fDepth > *pDepthData)
 			{
 				*pDepthData = fDepth;
 			}
@@ -475,7 +475,7 @@ namespace Star
 
 			if (m_pTexture)
 			{
-				m_pTexture->SampleTexture(textureColor, CurUV.x, CurUV.y);
+				m_pTexture->SampleTexture(textureColor, CurUV.x / fDepth, CurUV.y / fDepth);
 				switch (m_pRenderInfo->m_nColorFloats)
 				{
 				case 4:pFrameData[3] = textureColor.a;

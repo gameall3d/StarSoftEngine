@@ -229,7 +229,7 @@ void InitData()
 
 	pDevice->CreateSurface(&pDepthBuffer, ScreenWidth, ScreenHeight, CFMT_R32);
 	pRenderTarget->SetDepthBuffer(pDepthBuffer);
-	pDepthBuffer->Clear(StarColor(2, 0, 0, 0), NULL);
+	pDepthBuffer->Clear(StarColor(0, 0, 0, 0), NULL);
 
 	// create texture
 	StarTexture* pTexture;
