@@ -45,18 +45,11 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-StarSoftEngine/Debug/main.obj
-Debug/StarSoftEngine.exe
-Debug/StarSoftEngine.pdb
-Debug/StarSoftEngine.ilk
+/StarSoftEngine/Debug
+/Debug
 StarSoftEngine.sdf
 *.tlog
-StarSoftEngine/Debug/StarSoftEngine.log
 *.suo
-StarSoftEngine/Debug/vc120.pdb
-StarSoftEngine/Debug/vc120.idb
 *.obj
-StarSoftEngine/Debug/StarSurface.obj
 *.obj
-StarSoftEngine/Debug/StarSoftEngine.Build.CppClean.log
-StarSoftEngine/Debug/StarSurface.obj
+*.obj

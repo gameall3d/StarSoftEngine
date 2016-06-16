@@ -234,22 +234,24 @@ void InitData()
 	// create texture
 	StarTexture* pTexture;
 	float32* pTextureData;
-	pDevice->CreateTexture(&pTexture, 256, 256, CFMT_R32G32B32A32);
-	pTexture->LockRect((void**)&pTextureData, NULL);
+// 	pDevice->CreateTexture(&pTexture, 256, 256, CFMT_R32G32B32A32);
+// 	pTexture->LockRect((void**)&pTextureData, NULL);
+// 
+// 	// manual init texture data
+// 	for (int i = 0; i < 256; i++)
+// 	{
+// 		for (int j = 0; j < 256; j++)
+// 		{
+// 			int x = i / 32;
+// 			int y = j / 32;
+// 			StarColor* pCurData = (StarColor*)&pTextureData[4 * (i * 256 + j)];
+// 			*pCurData = ((x + y) & 1) ? StarColor::White : StarColor::Blue;
+// 		}
+// 	}
+// 
+// 	pTexture->UnlockRect();
 
-	// manual init texture data
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{
-			int x = i / 32;
-			int y = j / 32;
-			StarColor* pCurData = (StarColor*)&pTextureData[4 * (i * 256 + j)];
-			*pCurData = ((x + y) & 1) ? StarColor::White : StarColor::Blue;
-		}
-	}
-
-	pTexture->UnlockRect();
+	pDevice->CreateTextureFromFile(&pTexture, "data/chess.png");
 
 	pDevice->SetTexture(0, pTexture);
 

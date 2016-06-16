@@ -19,11 +19,16 @@ namespace Star
 		{
 			m_TransformMatrix[i] = StarMatrix44::IDENTITY;
 		}
+
+		// init freeimage
+		FreeImage_Initialise(0);
 	}
 
 	StarDevice::~StarDevice()
 	{
 		SAFE_DELETE(m_pRenderInfo);
+
+		FreeImage_DeInitialise();
 	}
 
 	EStarResult StarDevice::Create()
@@ -80,6 +85,40 @@ namespace Star
 		EStarResult rltCreateTexture = (*out_ppTexture)->Create(nWidth, nHeight, eColorFormat);
 
 		return rltCreateTexture;
+	}
+
+	EStarResult StarDevice::CreateTextureFromFile(StarTexture** out_ppTexture, std::string srcFile)
+	{
+		// use png first
+		FIBITMAP* pBitmap = FreeImage_Load(FIF_PNG, srcFile.c_str());
+
+		if (pBitmap == NULL)
+			return SR_FAILED;
+
+		int nWidth = FreeImage_GetWidth(pBitmap);
+		int nHeight = FreeImage_GetHeight(pBitmap);
+		EColorFormat eColorFormat = CFMT_R32G32B32A32;
+
+		EStarResult rltCreateTexture = CreateTexture(out_ppTexture, nWidth, nHeight, eColorFormat);
+
+		float32* pTextureData;
+		(*out_ppTexture)->LockRect((void**)&pTextureData, NULL);
+		RGBQUAD color;
+		for (int i = 0; i < nHeight; i++)
+		{
+			for (int j = 0; j < nWidth; j++)
+			{
+				int CurIndex = 4 * (i * nWidth + j);
+				StarColor* pCurData = (StarColor*)&pTextureData[CurIndex];
+				FreeImage_GetPixelColor(pBitmap, j, i, &color);
+				*pCurData = StarColor(color.rgbRed, color.rgbGreen, color.rgbBlue, color.rgbReserved);
+			}
+		}
+
+
+		(*out_ppTexture)->UnlockRect();
+
+		return SR_OK;
 	}
 
 	EStarResult StarDevice::SetTexture(uint32 nSamplerNum, StarTexture* pTexture)

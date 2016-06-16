@@ -1,6 +1,7 @@
 #ifndef __STARBASE_H_
 #define __STARBASE_H_
 #include <math.h>
+#include <string>
 
 #ifndef WIN32
 #define  OutputDebugString printf

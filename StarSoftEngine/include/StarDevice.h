@@ -4,6 +4,7 @@
 #include "StarPrerequisites.h"
 #include "StarTypes.h"
 #include "StarMatrix44.h"
+#include "FreeImage/FreeImage.h"
 
 namespace Star
 {
@@ -19,6 +20,7 @@ namespace Star
 	public:
 		EStarResult CreateSurface(StarSurface** out_ppSurface, uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat);
 		EStarResult CreateTexture(StarTexture** out_ppTexture, uint32 nWidth, uint32 nHeight, EColorFormat eColorFormat);
+		EStarResult CreateTextureFromFile(StarTexture** out_ppTexture, std::string srcFile);
 		EStarResult SetTexture(uint32 nSamplerNum, StarTexture* pTexture);
 
 		EStarResult PreRender();
